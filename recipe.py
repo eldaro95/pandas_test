@@ -14,9 +14,19 @@ def main(filename):
     date_id = _extract_date(filename) #extract date of data
     df = _add_date_id_col(df,date_id) #add date as a column
     df = _generate_energy(df) #calculate a energy percentage
-    #df = _saving_file(df) arreglar
+    #df = _saving_file(df) #por arreglar, no guarda en formato adecuado
+    df =_fill_missing_autor(df)
     return df
     
+def _fill_missing_autor(df):
+    logger.info('Filling missing author')
+    missing_author_mask = df['artists'].isna()
+    pattern = r'([a-z]+[0-9]+)' #Expresiones regulares
+    missing_id =df[missing_author_mask]['track_id'].str.extract(pattern)
+    df.loc[missing_author_mask,'artists'] = missing_id.loc[:'missing_id']
+    
+    return df
+
 def _read_data(filename):
     logger.info('Reading file {}'.format(filename))
     
